@@ -1013,7 +1013,7 @@ const LOG_LINES = [
   "[03:21:43] Roblox relaunched (PID 48512). Resuming watch.",
 ];
 
-const EXE_URL = "https://github.com/R-7wX/RoRejoinX/releases/download/1.0.0/RoRejoinX.exe";
+const EXE_URL = "https://github.com/R-7wX/RoRejoinX/releases/download/1.0.1/RoRejoinX.exe";
 
 function downloadExe() {
   const a = document.createElement("a");
