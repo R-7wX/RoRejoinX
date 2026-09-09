@@ -134,7 +134,7 @@ export default function App() {
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-3">
-          <ShieldCheck className="text-[#4dff9e]" size={24} />
+          <img src="/logo.png" alt="RoRejoinX Logo" className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(77,255,158,0.4)]" />
           <span className="font-bold tracking-tight text-xl">RoRejoinX</span>
         </div>
         <a href={release.releaseUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">
@@ -232,7 +232,7 @@ export default function App() {
       <footer className="relative z-10 border-t border-white/10">
         <div className="max-w-6xl mx-auto px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-neutral-500 text-sm">
-            <ShieldCheck size={16} className="text-[#4dff9e]/50" />
+            <img src="/logo.png" alt="Logo" className="w-4 h-4 rounded-sm opacity-50 grayscale" />
             <span>&copy; {new Date().getFullYear()} RoRejoinX &bull; Made by <span className="text-[#4dff9e]/70 font-medium">AXTS</span></span>
           </div>
           <a href="https://github.com/R-7wX/RoRejoinX" target="_blank" rel="noreferrer" className="text-neutral-500 text-sm hover:text-white transition-colors">
