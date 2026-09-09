@@ -4,7 +4,7 @@
 
 @layer utilities {
   .fade-in {
-    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    animation: fadeIn 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     opacity: 0;
     transform: translateY(20px);
   }
@@ -17,7 +17,25 @@
   }
 }
 
+/* Custom Webkit Scrollbar for the Glass Card */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(77, 255, 158, 0.2);
+  border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(77, 255, 158, 0.4);
+}
+
 body {
-  background-color: #000000;
-  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  background-color: #050907;
+  overflow-x: hidden;
 }
