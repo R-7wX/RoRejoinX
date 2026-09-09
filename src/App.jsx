@@ -194,7 +194,7 @@ export default function App() {
           <motion.img 
             animate={{ y: [0, -15, 0] }}
             transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-            src="/mockup.jpg" 
+            src="/mockup.png" 
             alt="RoRejoinX Interface" 
             className="relative z-10 w-full object-cover rounded-2xl shadow-2xl border border-white/10" 
           />
