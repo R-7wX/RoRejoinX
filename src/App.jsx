@@ -7,7 +7,7 @@ const GITHUB_API_LATEST = `https://api.github.com/repos/${REPO}/releases/latest`
 const GITHUB_RELEASES_PAGE = `https://github.com/${REPO}/releases`;
 
 function useLatestRelease() {
-  const [state, setState] = useState({ loading: true, version: null, zipUrl: null, releaseUrl: GITHUB_RELEASES_PAGE, body: null, error: null });
+  const [state, setState] = useState({ loading: true, version: null, exeUrl: null, releaseUrl: GITHUB_RELEASES_PAGE, body: null, error: null });
 
   useEffect(() => {
     let cancelled = false;
@@ -19,11 +19,11 @@ function useLatestRelease() {
       .then((data) => {
         if (cancelled) return;
         const version = (data.tag_name || "").replace(/^v/i, "");
-        const zipAsset = (data.assets || []).find((a) => a.name?.toLowerCase().endsWith(".zip"));
+        const exeAsset = (data.assets || []).find((a) => a.name?.toLowerCase().endsWith(".exe"));
         setState({
           loading: false,
           version: version || null,
-          zipUrl: zipAsset ? zipAsset.browser_download_url : null,
+          zipUrl: exeAsset ? exeAsset.browser_download_url : null,
           releaseUrl: data.html_url || GITHUB_RELEASES_PAGE,
           body: data.body || "*No release notes provided.*",
           error: null,
@@ -69,7 +69,7 @@ export default function App() {
 
           <div className="flex flex-wrap items-center gap-4">
             <a 
-              href={release.zipUrl || release.releaseUrl}
+              href={release.exeUrl || release.releaseUrl}
               className="flex items-center gap-2 px-6 py-4 bg-white text-black font-semibold rounded-lg hover:bg-neutral-200 transition-colors"
             >
               <Download size={18} /> 
@@ -85,7 +85,7 @@ export default function App() {
             </a>
           </div>
           <p className="mt-4 text-xs text-neutral-600 font-mono">
-            Windows 10/11 • Instantly-loading .zip bundle
+            Windows 10/11 • Custom Setup Wizard
           </p>
         </section>
 
