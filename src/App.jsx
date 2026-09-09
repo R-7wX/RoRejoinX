@@ -201,21 +201,6 @@ export default function App() {
         </motion.div>
       </main>
 
-      {/* Live Stats Banner */}
-      <motion.div 
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="relative z-10 max-w-5xl mx-auto px-8 mb-24"
-      >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-y border-white/10 bg-white/[0.01] backdrop-blur-sm">
-          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">1.2M+</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Crashes Prevented</div></div>
-          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">15k+</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Active Users</div></div>
-          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">99.9%</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Uptime Reliability</div></div>
-          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">&lt; 5s</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Avg Rejoin Time</div></div>
-        </div>
-      </motion.div>
-
       {/* Changelog Glass Card */}
       <section className="relative z-10 max-w-4xl mx-auto px-8 mb-32">
         {/* Changelog Glass Card */}
