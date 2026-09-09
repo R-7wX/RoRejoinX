@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import ReactMarkdown from "react-markdown";
+import { motion } from "framer-motion";
 import { Download, ExternalLink, ShieldCheck, Activity, BarChart3, Bell, Clock, Palette, RefreshCw } from "lucide-react";
 
 const GITHUB_API = "https://api.github.com/repos/R-7wX/RoRejoinX/releases";
@@ -182,6 +183,41 @@ export default function App() {
           </p>
         </section>
 
+        {/* Mockup Image */}
+        <motion.div 
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="relative w-full aspect-square md:aspect-[4/3] flex items-center justify-center"
+        >
+          <div className="absolute inset-0 bg-[#4dff9e] blur-[100px] opacity-20 rounded-full" />
+          <motion.img 
+            animate={{ y: [0, -15, 0] }}
+            transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+            src="/mockup.jpg" 
+            alt="RoRejoinX Interface" 
+            className="relative z-10 w-full object-cover rounded-2xl shadow-2xl border border-white/10" 
+          />
+        </motion.div>
+      </main>
+
+      {/* Live Stats Banner */}
+      <motion.div 
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        className="relative z-10 max-w-5xl mx-auto px-8 mb-24"
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 py-8 border-y border-white/10 bg-white/[0.01] backdrop-blur-sm">
+          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">1.2M+</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Crashes Prevented</div></div>
+          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">15k+</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Active Users</div></div>
+          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">99.9%</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Uptime Reliability</div></div>
+          <div className="text-center"><div className="text-3xl font-bold text-[#4dff9e] mb-1">&lt; 5s</div><div className="text-sm text-neutral-400 font-medium tracking-wide uppercase">Avg Rejoin Time</div></div>
+        </div>
+      </motion.div>
+
+      {/* Changelog Glass Card */}
+      <section className="relative z-10 max-w-4xl mx-auto px-8 mb-32">
         {/* Changelog Glass Card */}
         <section className="fade-in" style={{ animationDelay: "0.2s" }}>
           <div className="relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden">
@@ -209,7 +245,7 @@ export default function App() {
             </div>
           </div>
         </section>
-      </main>
+      </section>
 
       {/* Features Section */}
       <section ref={featuresRef} className="relative z-10 max-w-6xl mx-auto px-8 pb-32">
