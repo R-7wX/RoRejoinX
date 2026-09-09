@@ -2,6 +2,9 @@
 
 We are incredibly excited to announce the massive v1.1.1 update. We've completely redesigned the UI to an ultra-modern standard and added four powerhouse features that turn RoRejoinX into the ultimate Roblox utility suite.
 
+## 🔄 Auto-Updating Launcher
+* **Persistent Launcher:** The standalone Setup Wizard has been completely re-architected into a persistent, Auto-Updating Launcher that seamlessly installs updates and launches the app in one click.
+
 ## 🎨 Ultra-Modern UI Overhaul
 * **Custom Borderless Window:** We stripped away the clunky Windows borders and built a sleek, custom dragable title bar with hover-animated close/minimize buttons.
 * **Premium Graphical Icons:** Say goodbye to ugly text-emojis! The sidebar now features beautiful, high-definition transparent PNG icons.
