@@ -131,7 +131,7 @@ function FeatureCard({ icon: Icon, title, desc, delay }) {
 
 export default function App() {
   const release = useLatestRelease();
-  const versionLabel = release.loading ? "..." : release.version ? `v` : "v1.1.0";
+  const versionLabel = release.loading ? "..." : release.version ? `v${release.version}` : "v1.1.0";
   const [featuresRef, featuresVisible] = useScrollReveal();
 
   return (
