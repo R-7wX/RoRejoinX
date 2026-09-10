@@ -223,35 +223,7 @@ export default function App() {
                 </span>
               </div>
               <div className="prose prose-invert prose-neutral max-w-none prose-a:text-[#4dff9e] hover:prose-a:text-[#4dff9e]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[400px] overflow-y-auto custom-scrollbar pr-4">
-                  <ReactMarkdown>{`# RoRejoinX v1.1.1 - The "Max Level" UI & Powerhouse Expansion!
-
-## 🌟 Major Features & Additions
-
-*   **[NEW] Total UI Overhaul**: The entire app has been redesigned from the ground up! Enjoy a gorgeous dark glassmorphic theme, sleek rounded components, soft shadows, and custom native-feeling scrollbars.
-*   **[NEW] Custom Borderless Titlebar**: Say goodbye to ugly white Windows borders! The app now features a sleek, dragable custom top bar with native-feeling hover buttons for minimize and close.
-*   **[NEW] Multi-Account Support**: You can now securely add and save multiple \`.ROBLOSECURITY\` cookies. Launch different games using completely different accounts directly from the UI!
-*   **[NEW] Live Game Data (Player Counts & Thumbnails)**: Your Saved Games list now actively fetches real, live active player counts and real Roblox game thumbnails so you always know what's popping.
-*   **[NEW] Dual-Color Themes**: The Appearance section is a full color-picker studio. Mix and match Primary and Secondary accent colors, or use one of the beautiful new split-color presets like "Violet & Cyan" or "Rose & Orange".
-*   **[NEW] Compact Mode Uptime Tracker**: The Mini-Widget now actively tracks and displays your current session's total AFK Uptime directly on your screen.
-*   **[NEW] Launcher Setup Redesign**: The updater now features a gorgeous, borderless, themed loading screen that perfectly matches the main app.
-
-## 🔥 The Powerhouse Expansion Features
-
-*   **[NEW] Eco Mode (AFK CPU Saver)**: Safely throttle Roblox's CPU Priority to \`IDLE\` and restrict it to a single CPU core when farming, plummeting your CPU and power usage without triggering anti-cheat hooks.
-*   **[NEW] Auto-Shutdown Scheduler**: Set a specific time (e.g., 04:30 AM), and RoRejoinX will automatically stop watching, safely kill Roblox, and shut down your entire PC!
-*   **[NEW] Ghost Mode**: Enable this in settings, and your Compact Mode Mini-Widget will instantly turn 85% transparent when you hover over it so it never blocks your clicks or view while playing!
-*   **[NEW] Cloud Profile Sync**: Securely upload and backup your \`settings.json\` and \`saved_games.json\` directly to a private GitHub Gist, allowing you to instantly restore your profile on any other PC.
-*   **[NEW] Mobile Remote Control**: Stop your watchdog from your bed! RoRejoinX now spins up a secure local web server that you can access from your iPhone/Android browser on the same Wi-Fi network to click a massive "STOP" button.
-*   **[NEW] Discord Rich Presence**: Show your friends exactly what you are doing! RoRejoinX safely hooks into your local Discord client to display the game you are watching, the Place ID, and a live elapsed timer.
-*   **[NEW] Sound Cues**: Added a pleasant system chime alert for whenever the watchdog successfully detects a crash and relaunches your game.
-*   **[NEW] Premium PIL Icons**: All flat text-emojis in the sidebar have been replaced by high-definition, procedurally drawn anti-aliased PNG icons natively rendered by the Python Imaging Library.
-
-## 🐛 Fixes & Improvements
-*   Completely rewrote the UI rendering logic to fix layout overlapping bugs on Windows 11.
-*   Improved background threading logic to completely eliminate UI freezes during network requests.
-*   Fixed a bug where generic game SVGs would overlap with the status chip.
-*   Optimized the file loading system to prevent random \`NameError\` build crashes.
-`}</ReactMarkdown>
+                  <ReactMarkdown>{release.body}</ReactMarkdown>
               </div>
             </div>
           </div>
