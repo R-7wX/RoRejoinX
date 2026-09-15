@@ -207,7 +207,7 @@ function InteractiveMockup() {
               }}
               exit={{ opacity: 0, y: -100, rotateX: -20, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className={`absolute w-[95%] lg:w-[110%] rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,168,255,0.3)] border border-[#00a8ff]/20 object-cover`}
+              className={`absolute w-[95%] lg:w-[110%] rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,168,255,0.3)] border border-[#00a8ff]/20 object-contain h-auto`}
               style={{ zIndex: 10 - relIndex }}
               whileHover={isActive ? { scale: 1.02, rotateY: -3, rotateX: 3 } : {}}
             />
