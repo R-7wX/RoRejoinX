@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
-import { Download, ExternalLink, ShieldCheck, Activity, BarChart3, Bell, Clock, Palette, RefreshCw } from "lucide-react";
+import { Download, ExternalLink, Activity, Bell, RefreshCw, Palette, Users, Zap, Cpu } from "lucide-react";
 
 const GITHUB_API = "https://api.github.com/repos/R-7wX/RoRejoinX/releases";
 
@@ -60,7 +60,7 @@ function ThreeBackground() {
     mountRef.current.appendChild(renderer.domElement);
 
     const geometry = new THREE.IcosahedronGeometry(2, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x4dff9e, wireframe: true, transparent: true, opacity: 0.12 });
+    const material = new THREE.MeshBasicMaterial({ color: 0x00a8ff, wireframe: true, transparent: true, opacity: 0.12 });
     const mesh = new THREE.Mesh(geometry, material);
     scene.add(mesh);
     
@@ -69,7 +69,7 @@ function ThreeBackground() {
     const posArray = new Float32Array(particlesCount * 3);
     for(let i=0; i<particlesCount*3; i++) { posArray[i] = (Math.random() - 0.5) * 18; }
     particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particlesMat = new THREE.PointsMaterial({ size: 0.025, color: 0x4dff9e, transparent: true, opacity: 0.3 });
+    const particlesMat = new THREE.PointsMaterial({ size: 0.025, color: 0x00a8ff, transparent: true, opacity: 0.3 });
     const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
     scene.add(particlesMesh);
 
@@ -108,20 +108,20 @@ function ThreeBackground() {
 }
 
 const FEATURES = [
-  { icon: ShieldCheck, title: "Auto-Relaunch", desc: "Detects crashes instantly and relaunches you right back into your game." },
-  { icon: BarChart3, title: "Crash Stats & Streaks", desc: "Track your crash-free streaks, longest sessions, and unlock achievement badges." },
-  { icon: Bell, title: "Discord Alerts", desc: "Rich embed notifications to your Discord channel with crash screenshots." },
-  { icon: Clock, title: "Scheduled Watching", desc: "Set active hours so the watchdog only runs when you want it to." },
-  { icon: Palette, title: "Deep Customization", desc: "Custom themes, accent colors, backgrounds, and a compact mini-widget mode." },
-  { icon: RefreshCw, title: "Auto-Updates", desc: "One-click updates via the built-in setup wizard. Always stay current." },
+  { icon: Users, title: "Multi-Account Support", desc: "Run and monitor multiple Roblox accounts simultaneously from a single lightweight dashboard." },
+  { icon: Zap, title: "Auto Rejoin", desc: "Detects crashes and connection drops instantly, relaunching your accounts right back into the game." },
+  { icon: Cpu, title: "Memory Limiter", desc: "Set exact RAM limits. Safely flushes unused memory or restarts if the limit is exceeded." },
+  { icon: Bell, title: "Discord Webhooks", desc: "Get rich embed notifications to your Discord channel with real-time crash screenshots." },
+  { icon: Palette, title: "Deep Customization", desc: "Custom themes, compact mini-widget mode, and complete control over the watchdog behavior." },
+  { icon: RefreshCw, title: "Auto-Updates", desc: "One-click updates via the built-in updater. Always stay current with the latest patches." },
 ];
 
 function FeatureCard({ icon: Icon, title, desc, delay }) {
   const [ref, visible] = useScrollReveal();
   return (
-    <div ref={ref} className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:bg-white/[0.06] hover:border-[#4dff9e]/30 hover:shadow-[0_0_30px_-10px_rgba(77,255,158,0.15)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${delay}ms` }}>
-      <div className="w-10 h-10 rounded-xl bg-[#4dff9e]/10 flex items-center justify-center mb-4 group-hover:bg-[#4dff9e]/20 transition-colors">
-        <Icon size={20} className="text-[#4dff9e]" />
+    <div ref={ref} className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:bg-white/[0.06] hover:border-[#00a8ff]/30 hover:shadow-[0_0_30px_-10px_rgba(77,255,158,0.15)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${delay}ms` }}>
+      <div className="w-10 h-10 rounded-xl bg-[#00a8ff]/10 flex items-center justify-center mb-4 group-hover:bg-[#00a8ff]/20 transition-colors">
+        <Icon size={20} className="text-[#00a8ff]" />
       </div>
       <h3 className="text-white font-semibold text-base mb-2">{title}</h3>
       <p className="text-neutral-400 text-sm leading-relaxed">{desc}</p>
@@ -135,10 +135,10 @@ export default function App() {
   const [featuresRef, featuresVisible] = useScrollReveal();
 
   return (
-    <div className="min-h-screen text-white font-sans selection:bg-[#4dff9e] selection:text-black overflow-hidden relative">
+    <div className="min-h-screen text-white font-sans selection:bg-[#00a8ff] selection:text-black overflow-hidden relative">
       <ThreeBackground />
       
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#4dff9e] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#00a8ff] rounded-full blur-[150px] opacity-10 pointer-events-none" />
 
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-6xl mx-auto">
@@ -154,8 +154,8 @@ export default function App() {
       {/* Hero */}
       <main className="relative z-10 max-w-6xl mx-auto px-8 pt-20 pb-24 grid lg:grid-cols-2 gap-16 items-center">
         <section className="fade-in">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-8 text-xs font-semibold tracking-widest text-[#4dff9e] uppercase border border-[#4dff9e]/20 rounded-full bg-[#4dff9e]/10 backdrop-blur-md">
-            <span className="w-2 h-2 rounded-full bg-[#4dff9e] animate-pulse" />
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-8 text-xs font-semibold tracking-widest text-[#00a8ff] uppercase border border-[#00a8ff]/20 rounded-full bg-[#00a8ff]/10 backdrop-blur-md">
+            <span className="w-2 h-2 rounded-full bg-[#00a8ff] animate-pulse" />
             Roblox Crash Watchdog
           </div>
           
@@ -170,7 +170,7 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-4">
             <a 
               href={release.exeUrl || release.releaseUrl}
-              className="group relative flex items-center gap-3 px-8 py-4 bg-[#4dff9e] text-[#050907] font-bold rounded-xl overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_-10px_rgba(77,255,158,0.4)]"
+              className="group relative flex items-center gap-3 px-8 py-4 bg-[#00a8ff] text-[#050907] font-bold rounded-xl overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_-10px_rgba(77,255,158,0.4)]"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
               <Download size={20} className="relative z-10" /> 
@@ -198,7 +198,7 @@ export default function App() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="relative w-full aspect-square md:aspect-[4/3] flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-[#4dff9e] blur-[100px] opacity-20 rounded-full" />
+          <div className="absolute inset-0 bg-[#00a8ff] blur-[100px] opacity-20 rounded-full" />
           <motion.img 
             animate={{ y: [0, -15, 0] }}
             transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
@@ -214,15 +214,15 @@ export default function App() {
         {/* Changelog Glass Card */}
         <section className="fade-in" style={{ animationDelay: "0.2s" }}>
           <div className="relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#4dff9e] to-transparent opacity-50" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00a8ff] to-transparent opacity-50" />
             <div className="p-8 sm:p-10">
               <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
                 <h2 className="text-xl font-bold text-white">Latest Update</h2>
-                <span className="font-mono text-sm text-[#4dff9e] px-3 py-1 bg-[#4dff9e]/10 border border-[#4dff9e]/20 rounded-full shadow-[0_0_15px_-5px_rgba(77,255,158,0.5)]">
+                <span className="font-mono text-sm text-[#00a8ff] px-3 py-1 bg-[#00a8ff]/10 border border-[#00a8ff]/20 rounded-full shadow-[0_0_15px_-5px_rgba(77,255,158,0.5)]">
                   {versionLabel}
                 </span>
               </div>
-              <div className="prose prose-invert prose-neutral max-w-none prose-a:text-[#4dff9e] hover:prose-a:text-[#4dff9e]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[400px] overflow-y-auto custom-scrollbar pr-4">
+              <div className="prose prose-invert prose-neutral max-w-none prose-a:text-[#00a8ff] hover:prose-a:text-[#00a8ff]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[400px] overflow-y-auto custom-scrollbar pr-4">
                   <ReactMarkdown>{release.body}</ReactMarkdown>
               </div>
             </div>
@@ -252,7 +252,7 @@ export default function App() {
         <div className="max-w-6xl mx-auto px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-neutral-500 text-sm">
             <img src="/logo.png" alt="Logo" className="w-4 h-4 rounded-sm opacity-50 grayscale" />
-            <span>&copy; {new Date().getFullYear()} RoRejoinX &bull; Made by <span className="text-[#4dff9e]/70 font-medium">AXTS</span></span>
+            <span>&copy; {new Date().getFullYear()} RoRejoinX &bull; Made by <span className="text-[#00a8ff]/70 font-medium">AXTS</span></span>
           </div>
           <a href="https://github.com/R-7wX/RoRejoinX" target="_blank" rel="noreferrer" className="text-neutral-500 text-sm hover:text-white transition-colors">
             GitHub &rarr;
