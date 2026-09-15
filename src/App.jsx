@@ -137,7 +137,7 @@ function FeatureCard({ icon: Icon, title, desc, delay }) {
 
 function InteractiveMockup() {
   const [hovered, setHovered] = useState(false);
-  const images = ["/mockup1.png", "/mockup2.png", "/mockup3.png", "/mockup4.png", "/mockup5.png"];
+  const images = ["/mockup6.png", "/mockup2.png", "/mockup3.png", "/mockup4.png", "/mockup5.png"];
   
   return (
     <motion.div 
