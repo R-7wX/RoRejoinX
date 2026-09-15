@@ -181,7 +181,7 @@ function InteractiveMockup() {
 
   return (
     <div 
-      className="relative w-full aspect-[4/3] sm:aspect-[16/10] flex items-center justify-center cursor-pointer perspective-[2000px]"
+      className="relative w-full aspect-video flex items-center justify-center cursor-pointer perspective-[2000px]"
       onClick={() => setIndex((i) => (i + 1) % images.length)}
     >
       <AnimatePresence>
@@ -207,7 +207,7 @@ function InteractiveMockup() {
               }}
               exit={{ opacity: 0, y: -100, rotateX: -20, scale: 1.1 }}
               transition={{ type: "spring", stiffness: 200, damping: 25 }}
-              className={`absolute w-[95%] lg:w-[110%] rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,168,255,0.3)] border border-[#00a8ff]/20 object-contain h-auto`}
+              className={`absolute w-[95%] lg:w-[110%] shadow-[0_30px_60px_-15px_rgba(0,168,255,0.3)] object-contain h-auto`}
               style={{ zIndex: 10 - relIndex }}
               whileHover={isActive ? { scale: 1.02, rotateY: -3, rotateX: 3 } : {}}
             />
