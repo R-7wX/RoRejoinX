@@ -125,8 +125,8 @@ function FeatureCard({ icon: Icon, title, desc, delay }) {
   const [ref, visible] = useScrollReveal();
   const x = useMotionValue(0);
   const y = useMotionValue(0);
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
+  const mouseXSpring = useSpring(x, { stiffness: 600, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 600, damping: 20 });
   const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
   const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
 
@@ -153,7 +153,7 @@ function FeatureCard({ icon: Icon, title, desc, delay }) {
       style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className={`group relative p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md transition-all duration-700 hover:bg-white/[0.06] hover:border-[#00a8ff]/50 hover:shadow-[0_0_40px_-10px_rgba(0,168,255,0.3)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} 
+      className={`group relative p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md hover:bg-white/[0.06] hover:border-[#00a8ff]/50 hover:shadow-[0_0_40px_-10px_rgba(0,168,255,0.3)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} 
     >
       <div style={{ transform: "translateZ(30px)" }} className="relative z-10 w-12 h-12 rounded-xl bg-[#00a8ff]/10 flex items-center justify-center mb-6 shadow-lg shadow-[#00a8ff]/5 transition-colors">
         <Icon size={24} className="text-[#00a8ff]" />
@@ -222,6 +222,66 @@ function InteractiveMockup() {
     </div>
   )
 }
+
+function StatsDisplay3D() {
+  const [ref, visible] = useScrollReveal();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 400, damping: 25 });
+  const mouseYSpring = useSpring(y, { stiffness: 400, damping: 25 });
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["10deg", "-10deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-10deg", "10deg"]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    x.set(mouseX / rect.width - 0.5);
+    y.set(mouseY / rect.height - 0.5);
+  };
+
+  return (
+    <section ref={ref} className="relative z-10 max-w-5xl mx-auto px-8 pb-32 flex justify-center">
+      <motion.div
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => { x.set(0); y.set(0); }}
+        className={`relative w-full max-w-3xl p-1 rounded-3xl bg-gradient-to-br from-white/10 via-transparent to-[#00a8ff]/20 cursor-pointer ${visible ? 'opacity-100' : 'opacity-0'} transition-opacity duration-1000`}
+      >
+        <div className="bg-[#020617] rounded-[22px] p-8 md:p-12 overflow-hidden relative" style={{ transform: "translateZ(20px)", transformStyle: "preserve-3d" }}>
+          
+          {/* Cyber grid overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMCwxNjgsMjU1LDAuMSkiLz48L3N2Zz4=')] opacity-30" />
+          
+          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              { label: "Uptime Monitored", value: "99.9%", delay: 0 },
+              { label: "Avg Rejoin Time", value: "2.4s", delay: 100 },
+              { label: "Crash Detection", value: "Instant", delay: 200 }
+            ].map((stat, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20, translateZ: 0 }}
+                whileInView={{ opacity: 1, y: 0, translateZ: 40 + (i * 10) }}
+                transition={{ duration: 0.5, delay: stat.delay / 1000 }}
+                className="flex flex-col items-center justify-center p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.05] hover:border-[#00a8ff]/30 transition-colors shadow-2xl"
+              >
+                <div className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-[#00a8ff] mb-2">{stat.value}</div>
+                <div className="text-sm font-medium text-neutral-400 uppercase tracking-widest">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div 
+            style={{ transform: "translateZ(80px)" }} 
+            className="absolute -top-10 -right-10 w-40 h-40 bg-[#00a8ff] rounded-full blur-[80px] opacity-20 pointer-events-none" 
+          />
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
 export default function App() {
   const release = useLatestRelease();
   const versionLabel = release.loading ? "..." : release.version ? `v${release.version}` : "v1.1.0";
@@ -327,6 +387,7 @@ export default function App() {
       </section>
 
       {/* Footer */}
+      <StatsDisplay3D />
       <footer className="relative z-10 border-t border-white/10">
         <div className="max-w-6xl mx-auto px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3 text-neutral-500 text-sm">
