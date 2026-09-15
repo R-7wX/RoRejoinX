@@ -316,7 +316,7 @@ function ReleaseNotes3D({ release, versionLabel }) {
   };
 
   return (
-    <section className="relative z-10 max-w-4xl mx-auto px-8 mb-32 flex justify-center perspective-[2000px]">
+    <section className="relative z-10 max-w-4xl mx-auto w-full px-8 mb-32 perspective-[2000px]">
       <motion.div
         ref={ref}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
@@ -337,7 +337,7 @@ function ReleaseNotes3D({ release, versionLabel }) {
           </div>
           
           <div 
-            className="prose prose-invert prose-neutral max-w-none prose-a:text-[#00a8ff] hover:prose-a:text-[#00a8ff]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[350px] overflow-y-auto custom-scrollbar pr-4 relative z-20"
+            className="prose prose-invert prose-neutral max-w-none break-normal whitespace-normal prose-a:text-[#00a8ff] hover:prose-a:text-[#00a8ff]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[350px] overflow-y-auto custom-scrollbar pr-4 relative z-20"
             style={{ transform: "translateZ(20px)" }}
             onWheel={(e) => e.stopPropagation()}
           >
