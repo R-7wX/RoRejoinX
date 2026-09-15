@@ -51,39 +51,43 @@ function ThreeBackground() {
     const w = window.innerWidth;
     const h = window.innerHeight;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
-    camera.position.z = 5;
+    scene.fog = new THREE.FogExp2(0x000000, 0.06);
+
+    const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
+    camera.position.y = 1.5;
+    camera.position.z = 4;
+    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(w, h);
     renderer.setPixelRatio(window.devicePixelRatio);
     mountRef.current.appendChild(renderer.domElement);
 
-    const geometry = new THREE.IcosahedronGeometry(2, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0x00a8ff, wireframe: true, transparent: true, opacity: 0.12 });
-    const mesh = new THREE.Mesh(geometry, material);
-    scene.add(mesh);
-    
-    const particlesGeo = new THREE.BufferGeometry();
-    const particlesCount = 800;
-    const posArray = new Float32Array(particlesCount * 3);
-    for(let i=0; i<particlesCount*3; i++) { posArray[i] = (Math.random() - 0.5) * 18; }
-    particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particlesMat = new THREE.PointsMaterial({ size: 0.025, color: 0x00a8ff, transparent: true, opacity: 0.3 });
-    const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
-    scene.add(particlesMesh);
+    // Cybertech Grid
+    const gridHelper = new THREE.GridHelper(60, 60, 0x00a8ff, 0x00a8ff);
+    gridHelper.material.transparent = true;
+    gridHelper.material.opacity = 0.15;
+    scene.add(gridHelper);
 
     let mouseX = 0, mouseY = 0;
     const handleMouseMove = (e) => { mouseX = (e.clientX - w/2); mouseY = (e.clientY - h/2); };
     window.addEventListener("mousemove", handleMouseMove);
 
+    let time = 0;
     const animate = () => {
       requestAnimationFrame(animate);
-      const targetX = mouseX * 0.001;
-      const targetY = mouseY * 0.001;
-      mesh.rotation.y += 0.002 + (targetX - mesh.rotation.y) * 0.05;
-      mesh.rotation.x += 0.001 + (targetY - mesh.rotation.x) * 0.05;
-      particlesMesh.rotation.y += 0.0003;
+      time += 0.005;
+      
+      // Move grid towards camera to simulate forward movement
+      gridHelper.position.z = (time * 10) % 1;
+      
+      // Subtle camera sway
+      const targetX = mouseX * 0.0005;
+      const targetY = mouseY * 0.0005 + 1.5;
+      camera.position.x += (targetX - camera.position.x) * 0.05;
+      camera.position.y += (targetY - camera.position.y) * 0.05;
+      camera.lookAt(0, 0, 0);
+
       renderer.render(scene, camera);
     };
     animate();
@@ -101,10 +105,11 @@ function ThreeBackground() {
       if(mountRef.current && mountRef.current.contains(renderer.domElement)) {
           mountRef.current.removeChild(renderer.domElement);
       }
-      geometry.dispose(); material.dispose(); particlesGeo.dispose(); particlesMat.dispose(); renderer.dispose();
+      gridHelper.dispose(); renderer.dispose();
     };
   }, []);
-  return <div ref={mountRef} className="fixed inset-0 z-[-1] pointer-events-none bg-gradient-to-br from-[#020504] via-[#050d09] to-[#010302]" />;
+  // Use a dark tech-blue/black gradient instead of the old dark green
+  return <div ref={mountRef} className="fixed inset-0 z-[-1] pointer-events-none bg-gradient-to-b from-[#020617] via-[#000000] to-[#000000]" />;
 }
 
 const FEATURES = [
@@ -119,7 +124,7 @@ const FEATURES = [
 function FeatureCard({ icon: Icon, title, desc, delay }) {
   const [ref, visible] = useScrollReveal();
   return (
-    <div ref={ref} className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:bg-white/[0.06] hover:border-[#00a8ff]/30 hover:shadow-[0_0_30px_-10px_rgba(77,255,158,0.15)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${delay}ms` }}>
+    <div ref={ref} className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:bg-white/[0.06] hover:border-[#00a8ff]/30 hover:shadow-[0_0_30px_-10px_rgba(0,168,255,0.15)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${delay}ms` }}>
       <div className="w-10 h-10 rounded-xl bg-[#00a8ff]/10 flex items-center justify-center mb-4 group-hover:bg-[#00a8ff]/20 transition-colors">
         <Icon size={20} className="text-[#00a8ff]" />
       </div>
@@ -138,12 +143,12 @@ export default function App() {
     <div className="min-h-screen text-white font-sans selection:bg-[#00a8ff] selection:text-black overflow-hidden relative">
       <ThreeBackground />
       
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-[#00a8ff] rounded-full blur-[150px] opacity-10 pointer-events-none" />
+      
 
       {/* Navbar */}
       <nav className="relative z-10 flex items-center justify-between px-8 py-6 max-w-6xl mx-auto">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="RoRejoinX Logo" className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(77,255,158,0.4)]" />
+          <img src="/logo.png" alt="RoRejoinX Logo" className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(0,168,255,0.4)]" />
           <span className="font-bold tracking-tight text-xl">RoRejoinX</span>
         </div>
         <a href={release.releaseUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">
@@ -159,7 +164,7 @@ export default function App() {
             Roblox Crash Watchdog
           </div>
           
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.05] mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400">
+          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.15] pb-2 mb-4 text-transparent bg-clip-text bg-gradient-to-br from-white to-neutral-400">
             Never lose your spot again.
           </h1>
           
@@ -170,7 +175,7 @@ export default function App() {
           <div className="flex flex-wrap items-center gap-4">
             <a 
               href={release.exeUrl || release.releaseUrl}
-              className="group relative flex items-center gap-3 px-8 py-4 bg-[#00a8ff] text-[#050907] font-bold rounded-xl overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_-10px_rgba(77,255,158,0.4)]"
+              className="group relative flex items-center gap-3 px-8 py-4 bg-[#00a8ff] text-[#050907] font-bold rounded-xl overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_-10px_rgba(0,168,255,0.4)]"
             >
               <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
               <Download size={20} className="relative z-10" /> 
@@ -198,7 +203,7 @@ export default function App() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="relative w-full aspect-square md:aspect-[4/3] flex items-center justify-center"
         >
-          <div className="absolute inset-0 bg-[#00a8ff] blur-[100px] opacity-20 rounded-full" />
+          
           <motion.img 
             animate={{ y: [0, -15, 0] }}
             transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
@@ -218,7 +223,7 @@ export default function App() {
             <div className="p-8 sm:p-10">
               <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
                 <h2 className="text-xl font-bold text-white">Latest Update</h2>
-                <span className="font-mono text-sm text-[#00a8ff] px-3 py-1 bg-[#00a8ff]/10 border border-[#00a8ff]/20 rounded-full shadow-[0_0_15px_-5px_rgba(77,255,158,0.5)]">
+                <span className="font-mono text-sm text-[#00a8ff] px-3 py-1 bg-[#00a8ff]/10 border border-[#00a8ff]/20 rounded-full shadow-[0_0_15px_-5px_rgba(0,168,255,0.5)]">
                   {versionLabel}
                 </span>
               </div>
