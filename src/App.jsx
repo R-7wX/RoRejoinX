@@ -121,6 +121,82 @@ const FEATURES = [
   { icon: RefreshCw, title: "Auto-Updates", desc: "One-click updates via the built-in updater. Always stay current with the latest patches." },
 ];
 
+
+function SystemStatus() {
+  const [hover, setHover] = useState(false);
+  return (
+    <div 
+      className="relative flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 cursor-pointer backdrop-blur-md hover:bg-white/10 transition-colors"
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <div className="w-2 h-2 rounded-full bg-[#00a8ff] animate-pulse shadow-[0_0_10px_#00a8ff]" />
+      <span className="text-xs font-semibold text-neutral-300">Systems Online</span>
+      <AnimatePresence>
+        {hover && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 5, scale: 0.95 }}
+            className="absolute top-full right-0 mt-2 w-48 p-3 rounded-xl bg-[#020617]/90 border border-[#00a8ff]/30 backdrop-blur-xl shadow-2xl z-50"
+          >
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs text-neutral-400">API Status</span>
+              <span className="text-xs text-[#00a8ff]">Connected</span>
+            </div>
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-xs text-neutral-400">Latency</span>
+              <span className="text-xs text-[#00a8ff]">12ms</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-xs text-neutral-400">Watchdog</span>
+              <span className="text-xs text-[#00a8ff]">Active</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+
+function MagneticButton({ children, href, primary }) {
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 150, damping: 15, mass: 0.5 });
+  const mouseYSpring = useSpring(y, { stiffness: 150, damping: 15, mass: 0.5 });
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left - rect.width / 2;
+    const mouseY = e.clientY - rect.top - rect.height / 2;
+    x.set(mouseX * 0.3);
+    y.set(mouseY * 0.3);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
+  return (
+    <motion.a
+      href={href}
+      target={primary ? "_self" : "_blank"}
+      rel={primary ? "" : "noreferrer"}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ x: mouseXSpring, y: mouseYSpring }}
+      className={`group relative flex items-center gap-3 px-8 py-4 font-bold rounded-xl overflow-hidden transition-transform shadow-2xl ${primary ? 'bg-[#00a8ff] text-[#050907] shadow-[0_0_40px_-10px_rgba(0,168,255,0.4)]' : 'text-white border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10'}`}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+    >
+      {primary && <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />}
+      {children}
+    </motion.a>
+  );
+}
+
 function FeatureCard({ icon: Icon, title, desc, delay }) {
   const [ref, visible] = useScrollReveal();
   const x = useMotionValue(0);
@@ -223,6 +299,56 @@ function InteractiveMockup() {
   )
 }
 
+
+function ReleaseNotes3D({ release, versionLabel }) {
+  const [ref, visible] = useScrollReveal();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 25 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 25 });
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    x.set((e.clientX - rect.left) / rect.width - 0.5);
+    y.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+
+  return (
+    <section className="relative z-10 max-w-4xl mx-auto px-8 mb-32 flex justify-center perspective-[2000px]">
+      <motion.div
+        ref={ref}
+        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => { x.set(0); y.set(0); }}
+        className={`w-full relative rounded-3xl border border-[#00a8ff]/20 bg-[#020617]/80 backdrop-blur-xl shadow-[0_30px_60px_-15px_rgba(0,168,255,0.2)] transition-opacity duration-1000 ${visible ? 'opacity-100' : 'opacity-0'}`}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#00a8ff]/10 to-transparent rounded-3xl pointer-events-none" />
+        
+        <div className="p-8 sm:p-12 relative" style={{ transform: "translateZ(30px)", transformStyle: "preserve-3d" }}>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 border-b border-white/10 pb-6 gap-4">
+            <h2 className="text-2xl font-bold text-white flex items-center gap-3">
+              <RefreshCw className="text-[#00a8ff]" size={24} /> Latest Update
+            </h2>
+            <span className="font-mono text-sm font-bold text-[#020617] px-4 py-1.5 bg-[#00a8ff] rounded-full shadow-[0_0_20px_rgba(0,168,255,0.6)]">
+              {versionLabel}
+            </span>
+          </div>
+          
+          <div 
+            className="prose prose-invert prose-neutral max-w-none prose-a:text-[#00a8ff] hover:prose-a:text-[#00a8ff]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[350px] overflow-y-auto custom-scrollbar pr-4 relative z-20"
+            style={{ transform: "translateZ(20px)" }}
+            onWheel={(e) => e.stopPropagation()}
+          >
+              <ReactMarkdown>{release.body}</ReactMarkdown>
+          </div>
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
 function StatsDisplay3D() {
   const [ref, visible] = useScrollReveal();
   const x = useMotionValue(0);
@@ -299,9 +425,12 @@ export default function App() {
           <img src="/logo.png" alt="RoRejoinX Logo" className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(0,168,255,0.4)]" />
           <span className="font-bold tracking-tight text-xl">RoRejoinX</span>
         </div>
-        <a href={release.releaseUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">
-          GitHub
-        </a>
+        <div className="flex items-center gap-6">
+          <a href={release.releaseUrl} target="_blank" rel="noreferrer" className="text-sm font-medium text-neutral-400 hover:text-white transition-colors">
+            GitHub
+          </a>
+          <SystemStatus />
+        </div>
       </nav>
 
       {/* Hero */}
@@ -320,23 +449,15 @@ export default function App() {
             RoRejoinX silently monitors your game in the background. The instant Roblox closes unexpectedly, you are instantly launched right back in.
           </p>
 
-          <div className="flex flex-wrap items-center gap-4">
-            <a 
-              href={release.exeUrl || release.releaseUrl}
-              className="group relative flex items-center gap-3 px-8 py-4 bg-[#00a8ff] text-[#050907] font-bold rounded-xl overflow-hidden transition-transform hover:scale-[1.02] shadow-[0_0_40px_-10px_rgba(0,168,255,0.4)]"
-            >
-              <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+          <div className="flex flex-wrap items-center gap-4 z-20 relative">
+            <MagneticButton href={release.exeUrl || release.releaseUrl} primary>
               <Download size={20} className="relative z-10" /> 
               <span className="relative z-10">Download {versionLabel}</span>
-            </a>
-            <a 
-              href={release.releaseUrl}
-              target="_blank" rel="noreferrer"
-              className="flex items-center gap-3 px-8 py-4 text-white font-medium rounded-xl border border-white/10 bg-white/5 backdrop-blur-md hover:bg-white/10 transition-colors"
-            >
+            </MagneticButton>
+            <MagneticButton href={release.releaseUrl}>
               <ExternalLink size={20} />
-              View Source
-            </a>
+              <span className="relative z-10">View Source</span>
+            </MagneticButton>
           </div>
           
           <p className="mt-6 text-sm text-neutral-500 font-mono">
@@ -348,26 +469,8 @@ export default function App() {
         <InteractiveMockup />
       </main>
 
-      {/* Changelog Glass Card */}
-      <section className="relative z-10 max-w-4xl mx-auto px-8 mb-32">
-        {/* Changelog Glass Card */}
-        <section className="fade-in" style={{ animationDelay: "0.2s" }}>
-          <div className="relative rounded-3xl border border-white/10 bg-black/40 backdrop-blur-xl shadow-2xl overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#00a8ff] to-transparent opacity-50" />
-            <div className="p-8 sm:p-10">
-              <div className="flex items-center justify-between mb-8 border-b border-white/10 pb-6">
-                <h2 className="text-xl font-bold text-white">Latest Update</h2>
-                <span className="font-mono text-sm text-[#00a8ff] px-3 py-1 bg-[#00a8ff]/10 border border-[#00a8ff]/20 rounded-full shadow-[0_0_15px_-5px_rgba(0,168,255,0.5)]">
-                  {versionLabel}
-                </span>
-              </div>
-              <div className="prose prose-invert prose-neutral max-w-none prose-a:text-[#00a8ff] hover:prose-a:text-[#00a8ff]/80 prose-headings:text-white prose-strong:text-white prose-li:text-neutral-300 h-[400px] overflow-y-auto custom-scrollbar pr-4">
-                  <ReactMarkdown>{release.body}</ReactMarkdown>
-              </div>
-            </div>
-          </div>
-        </section>
-      </section>
+      {/* 3D Changelog */}
+      <ReleaseNotes3D release={release} versionLabel={versionLabel} />
 
       {/* Features Section */}
       <section ref={featuresRef} className="relative z-10 max-w-6xl mx-auto px-8 pb-32">
