@@ -134,6 +134,43 @@ function FeatureCard({ icon: Icon, title, desc, delay }) {
   );
 }
 
+
+function InteractiveMockup() {
+  const [hovered, setHovered] = useState(false);
+  const images = ["/mockup1.png", "/mockup2.png", "/mockup3.png", "/mockup4.png", "/mockup5.png"];
+  
+  return (
+    <motion.div 
+      className="relative w-full aspect-square md:aspect-[4/3] flex items-center justify-center"
+      style={{ perspective: 1200 }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      initial={{ opacity: 0, x: 50 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+    >
+       {images.map((img, i) => (
+          <motion.img
+            key={i}
+            src={img}
+            animate={{ 
+               y: hovered ? (i - 2) * -10 : i * 15,
+               x: hovered ? (i - 2) * 50 : 0,
+               scale: hovered ? 0.95 : 1 - i * 0.05,
+               rotateY: hovered ? (i - 2) * -15 : 0,
+               rotateZ: hovered ? (i - 2) * 4 : 0,
+               zIndex: 10 - i,
+               opacity: hovered ? (1 - i * 0.05) : 1 - i * 0.15
+            }}
+            transition={{ type: "spring", stiffness: 200, damping: 20, delay: i * 0.02 }}
+            className="absolute w-[85%] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 object-cover cursor-pointer"
+            style={{ transformStyle: 'preserve-3d' }}
+          />
+       ))}
+    </motion.div>
+  )
+}
+
 export default function App() {
   const release = useLatestRelease();
   const versionLabel = release.loading ? "..." : release.version ? `v${release.version}` : "v1.1.0";
@@ -196,22 +233,8 @@ export default function App() {
           </p>
         </section>
 
-        {/* Mockup Image */}
-        <motion.div 
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative w-full aspect-square md:aspect-[4/3] flex items-center justify-center"
-        >
-          
-          <motion.img 
-            animate={{ y: [0, -15, 0] }}
-            transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-            src="/mockup.png" 
-            alt="RoRejoinX Interface" 
-            className="relative z-10 w-full object-cover rounded-2xl shadow-2xl border border-white/10" 
-          />
-        </motion.div>
+        {/* Interactive 3D Mockup */}
+        <InteractiveMockup />
       </main>
 
       {/* Changelog Glass Card */}
