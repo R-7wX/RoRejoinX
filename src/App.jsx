@@ -170,7 +170,7 @@ function FeatureCard({ icon: Icon, title, desc, delay }) {
 
 function InteractiveMockup() {
   const [index, setIndex] = useState(0);
-  const images = ["/mockup1.png", "/mockup6.png", "/mockup2.png", "/mockup3.png", "/mockup5.png", "/mockup4.png"];
+  const images = ["/new_mockup_home.png", "/new_mockup_accounts.png", "/new_mockup_activity.png", "/new_mockup_stats.png", "/new_mockup_info.png"];
 
   useEffect(() => {
     const timer = setInterval(() => {
