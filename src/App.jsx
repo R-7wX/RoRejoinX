@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 import ReactMarkdown from "react-markdown";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform, useSpring, AnimatePresence } from "framer-motion";
 import { Download, ExternalLink, Activity, Bell, RefreshCw, Palette, Users, Zap, Cpu } from "lucide-react";
 
 const GITHUB_API = "https://api.github.com/repos/R-7wX/RoRejoinX/releases";
@@ -123,54 +123,105 @@ const FEATURES = [
 
 function FeatureCard({ icon: Icon, title, desc, delay }) {
   const [ref, visible] = useScrollReveal();
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+
+  const handleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    const xPct = mouseX / width - 0.5;
+    const yPct = mouseY / height - 0.5;
+    x.set(xPct);
+    y.set(yPct);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   return (
-    <div ref={ref} className={`group relative p-6 rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-md transition-all duration-500 hover:bg-white/[0.06] hover:border-[#00a8ff]/30 hover:shadow-[0_0_30px_-10px_rgba(0,168,255,0.15)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`} style={{ transitionDelay: `${delay}ms` }}>
-      <div className="w-10 h-10 rounded-xl bg-[#00a8ff]/10 flex items-center justify-center mb-4 group-hover:bg-[#00a8ff]/20 transition-colors">
-        <Icon size={20} className="text-[#00a8ff]" />
+    <motion.div 
+      ref={ref} 
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className={`group relative p-6 rounded-2xl border border-white/10 bg-black/40 backdrop-blur-md transition-all duration-700 hover:bg-white/[0.06] hover:border-[#00a8ff]/50 hover:shadow-[0_0_40px_-10px_rgba(0,168,255,0.3)] ${visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}`} 
+    >
+      <div style={{ transform: "translateZ(30px)" }} className="relative z-10 w-12 h-12 rounded-xl bg-[#00a8ff]/10 flex items-center justify-center mb-6 shadow-lg shadow-[#00a8ff]/5 transition-colors">
+        <Icon size={24} className="text-[#00a8ff]" />
       </div>
-      <h3 className="text-white font-semibold text-base mb-2">{title}</h3>
-      <p className="text-neutral-400 text-sm leading-relaxed">{desc}</p>
-    </div>
+      <h3 style={{ transform: "translateZ(20px)" }} className="relative z-10 text-white font-bold text-lg mb-3">{title}</h3>
+      <p style={{ transform: "translateZ(10px)" }} className="relative z-10 text-neutral-400 text-sm leading-relaxed">{desc}</p>
+      
+      {/* 3D Glow Effect */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-[#00a8ff]/0 to-[#00a8ff]/0 group-hover:from-[#00a8ff]/5 group-hover:to-transparent pointer-events-none transition-all duration-500" />
+    </motion.div>
   );
 }
 
 
 function InteractiveMockup() {
-  const [hovered, setHovered] = useState(false);
-  const images = ["/mockup6.png", "/mockup2.png", "/mockup3.png", "/mockup4.png", "/mockup5.png"];
-  
+  const [index, setIndex] = useState(0);
+  const images = ["/mockup6.png", "/mockup3.png", "/mockup2.png", "/mockup4.png", "/mockup5.png"];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
   return (
-    <motion.div 
-      className="relative w-full aspect-square md:aspect-[4/3] flex items-center justify-center"
-      style={{ perspective: 1200 }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      initial={{ opacity: 0, x: 50 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
+    <div 
+      className="relative w-full aspect-[4/3] sm:aspect-[16/10] flex items-center justify-center cursor-pointer perspective-[2000px]"
+      onClick={() => setIndex((i) => (i + 1) % images.length)}
     >
-       {images.map((img, i) => (
-          <motion.img
-            key={i}
-            src={img}
-            animate={{ 
-               y: hovered ? (i - 2) * -10 : i * 15,
-               x: hovered ? (i - 2) * 50 : 0,
-               scale: hovered ? 0.95 : 1 - i * 0.05,
-               rotateY: hovered ? (i - 2) * -15 : 0,
-               rotateZ: hovered ? (i - 2) * 4 : 0,
-               zIndex: 10 - i,
-               opacity: hovered ? (1 - i * 0.05) : 1 - i * 0.15
-            }}
-            transition={{ type: "spring", stiffness: 200, damping: 20, delay: i * 0.02 }}
-            className="absolute w-[85%] rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border border-white/20 object-cover cursor-pointer"
-            style={{ transformStyle: 'preserve-3d' }}
-          />
-       ))}
-    </motion.div>
+      <AnimatePresence>
+       {images.map((img, i) => {
+          const relIndex = (i - index + images.length) % images.length;
+          const isActive = relIndex === 0;
+          const isVisible = relIndex < 3;
+          
+          if (!isVisible) return null;
+
+          return (
+            <motion.img
+              key={img}
+              src={img}
+              initial={{ opacity: 0, y: 100, rotateX: 20, scale: 0.8 }}
+              animate={{ 
+                 z: isActive ? 0 : -relIndex * 60,
+                 y: isActive ? 0 : relIndex * 30,
+                 scale: isActive ? 1 : 1 - relIndex * 0.08,
+                 opacity: isActive ? 1 : 1 - relIndex * 0.4,
+                 rotateX: isActive ? 0 : 5,
+                 rotateY: isActive ? 0 : 0
+              }}
+              exit={{ opacity: 0, y: -100, rotateX: -20, scale: 1.1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 25 }}
+              className={`absolute w-[95%] lg:w-[110%] rounded-2xl shadow-[0_30px_60px_-15px_rgba(0,168,255,0.3)] border border-[#00a8ff]/20 object-cover`}
+              style={{ zIndex: 10 - relIndex }}
+              whileHover={isActive ? { scale: 1.02, rotateY: -3, rotateX: 3 } : {}}
+            />
+          );
+       })}
+      </AnimatePresence>
+      <div className="absolute -bottom-8 flex gap-2">
+        {images.map((_, i) => (
+          <div key={i} className={`h-1.5 rounded-full transition-all duration-500 ${i === index ? 'w-8 bg-[#00a8ff]' : 'w-2 bg-white/20'}`} />
+        ))}
+      </div>
+    </div>
   )
 }
-
 export default function App() {
   const release = useLatestRelease();
   const versionLabel = release.loading ? "..." : release.version ? `v${release.version}` : "v1.1.0";
