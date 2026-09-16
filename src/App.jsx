@@ -57,8 +57,7 @@ function ThreeBackground() {
 
     // --- Scene & Fog ---
     const scene = new THREE.Scene();
-    // Cyber void fog - blends smoothly into deep cyber dark blue / black
-    scene.fog = new THREE.FogExp2(0x020617, 0.042);
+    scene.fog = new THREE.FogExp2(0x020617, 0.040);
 
     // --- Camera ---
     const camera = new THREE.PerspectiveCamera(65, w / h, 0.1, 120);
@@ -118,42 +117,83 @@ function ThreeBackground() {
     ceilingMesh.position.y = 8.5;
     scene.add(ceilingMesh);
 
-    // --- Floating Holographic Cyber Crystals / Polyhedrons ---
+    // Helper: calculate visible viewport bounds at a given Z depth
+    const getVisibleBounds = (targetZ) => {
+      const dist = Math.max(0.1, camera.position.z - targetZ);
+      const vFov = (camera.fov * Math.PI) / 180;
+      const halfH = Math.tan(vFov / 2) * dist;
+      const halfW = halfH * camera.aspect;
+      return { halfW, halfH };
+    };
+
+    // --- 18 Floating Holographic Cyber Crystals (Framed Inside Display) ---
     const crystals = [];
     const crystalGeos = [
-      new THREE.IcosahedronGeometry(0.55, 0),
-      new THREE.OctahedronGeometry(0.5, 0),
-      new THREE.TetrahedronGeometry(0.5, 0),
-      new THREE.BoxGeometry(0.55, 0.55, 0.55),
+      new THREE.IcosahedronGeometry(0.48, 0),
+      new THREE.OctahedronGeometry(0.44, 0),
+      new THREE.TetrahedronGeometry(0.46, 0),
+      new THREE.BoxGeometry(0.48, 0.48, 0.48),
+      new THREE.DodecahedronGeometry(0.42, 0),
     ];
-    const crystalColors = [0x00f0ff, 0x00a8ff, 0x818cf8, 0x38bdf8];
+    const crystalColors = [0x00f0ff, 0x00a8ff, 0x38bdf8, 0x818cf8, 0xa855f7];
 
-    for (let i = 0; i < 18; i++) {
+    // Normalized screen coordinates (X: -1 to +1, Y: -1 to +1) kept strictly inside viewport [0.85 safe zone]
+    const layout = [
+      // Left Flank (9 crystals)
+      { nx: -0.80, ny:  0.65, z: -1.0 },
+      { nx: -0.72, ny:  0.30, z:  0.5 },
+      { nx: -0.62, ny:  0.72, z: -2.0 },
+      { nx: -0.82, ny: -0.05, z:  1.2 },
+      { nx: -0.52, ny: -0.42, z: -0.5 },
+      { nx: -0.75, ny: -0.60, z:  0.0 },
+      { nx: -0.42, ny:  0.15, z: -1.2 },
+      { nx: -0.78, ny:  0.48, z:  1.4 },
+      { nx: -0.58, ny: -0.20, z: -2.2 },
+
+      // Right Flank (9 crystals)
+      { nx:  0.80, ny:  0.65, z:  0.5 },
+      { nx:  0.72, ny:  0.30, z: -1.0 },
+      { nx:  0.62, ny:  0.72, z:  1.0 },
+      { nx:  0.82, ny: -0.05, z: -2.0 },
+      { nx:  0.52, ny: -0.42, z:  0.0 },
+      { nx:  0.75, ny: -0.60, z: -0.5 },
+      { nx:  0.42, ny:  0.15, z:  1.5 },
+      { nx:  0.78, ny:  0.48, z: -1.2 },
+      { nx:  0.58, ny: -0.20, z:  0.8 },
+    ];
+
+    for (let i = 0; i < layout.length; i++) {
       const geo = crystalGeos[i % crystalGeos.length];
       const color = crystalColors[i % crystalColors.length];
+      const baseOpacity = 0.38 + (i % 3) * 0.1;
 
       const mat = new THREE.MeshBasicMaterial({
         color: color,
         wireframe: true,
         transparent: true,
-        opacity: 0.35 + Math.random() * 0.25,
+        opacity: baseOpacity,
         blending: THREE.AdditiveBlending,
       });
       const mesh = new THREE.Mesh(geo, mat);
 
-      const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.5;
-      const radius = 3.5 + Math.random() * 7;
-      mesh.position.x = Math.cos(angle) * radius;
-      mesh.position.y = -0.5 + Math.random() * 4.5;
-      mesh.position.z = -2 + (Math.random() - 0.5) * 10;
+      // Initial placement within bounds
+      const bounds = getVisibleBounds(layout[i].z);
+      mesh.position.x = layout[i].nx * bounds.halfW * 0.86;
+      mesh.position.y = camera.position.y + layout[i].ny * bounds.halfH * 0.78;
+      mesh.position.z = layout[i].z;
 
       mesh.userData = {
-        rotX: (Math.random() - 0.5) * 0.015,
-        rotY: (Math.random() - 0.5) * 0.02,
-        rotZ: (Math.random() - 0.5) * 0.01,
-        initialY: mesh.position.y,
-        floatSpeed: 0.8 + Math.random() * 1.2,
-        floatOffset: Math.random() * Math.PI * 2,
+        nx: layout[i].nx,
+        ny: layout[i].ny,
+        z: layout[i].z,
+        rotX: 0.008 + (Math.random() - 0.5) * 0.012,
+        rotY: 0.012 + (Math.random() - 0.5) * 0.016,
+        rotZ: 0.006 + (Math.random() - 0.5) * 0.008,
+        floatSpeed: 0.9 + Math.random() * 0.9,
+        floatOffset: (i / 18) * Math.PI * 2,
+        baseOpacity: baseOpacity,
+        currentScale: 1.0,
+        spinBoost: 0,
       };
 
       scene.add(mesh);
@@ -161,19 +201,19 @@ function ThreeBackground() {
     }
 
     // --- Cyber Floating Particle Field (Data Packets) ---
-    const particleCount = 450;
+    const particleCount = 420;
     const particlePositions = new Float32Array(particleCount * 3);
     const particleVelocities = [];
 
     for (let i = 0; i < particleCount; i++) {
-      particlePositions[i * 3 + 0] = (Math.random() - 0.5) * 45;
-      particlePositions[i * 3 + 1] = -2 + Math.random() * 9;
-      particlePositions[i * 3 + 2] = -20 + Math.random() * 30;
+      particlePositions[i * 3 + 0] = (Math.random() - 0.5) * 35;
+      particlePositions[i * 3 + 1] = -2 + Math.random() * 8;
+      particlePositions[i * 3 + 2] = -18 + Math.random() * 26;
 
       particleVelocities.push({
-        x: (Math.random() - 0.5) * 0.006,
-        y: 0.004 + Math.random() * 0.008,
-        z: 0.01 + Math.random() * 0.02,
+        x: (Math.random() - 0.5) * 0.005,
+        y: 0.004 + Math.random() * 0.007,
+        z: 0.01 + Math.random() * 0.018,
       });
     }
 
@@ -183,7 +223,7 @@ function ThreeBackground() {
       color: 0x00e5ff,
       size: 0.11,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.65,
       blending: THREE.AdditiveBlending,
     });
     const particleSystem = new THREE.Points(particleGeo, particleMat);
@@ -222,6 +262,11 @@ function ThreeBackground() {
       clickShockwave.z = 0;
       clickShockwave.radius = 0;
       clickShockwave.strength = 1.6;
+
+      // On click: burst spin on all crystals!
+      crystals.forEach(c => {
+        c.userData.spinBoost = 0.25;
+      });
     };
 
     window.addEventListener("mousemove", onMouseMove, { passive: true });
@@ -241,13 +286,13 @@ function ThreeBackground() {
       mouseY += (targetMouseY - mouseY) * 0.05;
 
       // Camera Parallax
-      camera.position.x = mouseX * 1.2;
-      camera.position.y = 1.8 + mouseY * 0.7;
-      camera.lookAt(mouseX * 0.4, -0.2 + mouseY * 0.3, -3);
+      camera.position.x = mouseX * 0.9;
+      camera.position.y = 1.8 + mouseY * 0.5;
+      camera.lookAt(mouseX * 0.3, -0.2 + mouseY * 0.2, -3);
 
       // Update Cursor 3D Point Light
-      cursorLight.position.x = mouseX * 8;
-      cursorLight.position.y = -0.5 + mouseY * 4;
+      cursorLight.position.x = mouseX * 7;
+      cursorLight.position.y = camera.position.y + mouseY * 3.5;
       cursorLight.position.z = 2.5;
 
       // Pulsing horizon glow
@@ -270,16 +315,15 @@ function ThreeBackground() {
         const vx = positions[i * 3 + 0];
         const vz = positions[i * 3 + 2];
 
-        // Rolling cyber wave
         let vy = Math.sin(vx * 0.18 + waveSpeed) * 0.45 
                + Math.cos(vz * 0.14 + waveSpeed * 0.8) * 0.45;
 
         // Interactive mouse proximity wave
-        const dx = vx - (mouseX * 12);
-        const dz = vz - (-2 - mouseY * 6);
+        const dx = vx - (mouseX * 10);
+        const dz = vz - (-2 - mouseY * 5);
         const dist = Math.sqrt(dx * dx + dz * dz);
-        if (dist < 14) {
-          const factor = Math.cos((dist / 14) * Math.PI * 0.5);
+        if (dist < 13) {
+          const factor = Math.cos((dist / 13) * Math.PI * 0.5);
           vy += factor * 0.9 * Math.sin(dist * 0.8 - time * 4);
         }
 
@@ -300,13 +344,61 @@ function ThreeBackground() {
       // Forward motion on ceiling grid
       ceilingMesh.position.z = (time * 2) % 2;
 
-      // Animate Floating Cyber Crystals
+      // --- Animate & Interact with Floating Cyber Polyhedra ---
       crystals.forEach((mesh) => {
-        mesh.rotation.x += mesh.userData.rotX;
-        mesh.rotation.y += mesh.userData.rotY;
-        mesh.rotation.z += mesh.userData.rotZ;
-        mesh.position.y = mesh.userData.initialY + Math.sin(time * mesh.userData.floatSpeed + mesh.userData.floatOffset) * 0.35;
-        mesh.position.x += ((mesh.position.x + mouseX * 0.3) - mesh.position.x) * 0.02;
+        const ud = mesh.userData;
+        const bounds = getVisibleBounds(ud.z);
+
+        // Keep strictly within 86% of display bounds (NEVER out of screen)
+        const baseX = ud.nx * bounds.halfW * 0.86;
+        const baseY = camera.position.y + ud.ny * bounds.halfH * 0.78;
+        const floatY = Math.sin(time * ud.floatSpeed + ud.floatOffset) * 0.22;
+
+        // Mouse interaction in screen/world coordinates at this depth
+        const mouseAtZ_X = mouseX * bounds.halfW * 0.86;
+        const mouseAtZ_Y = camera.position.y + mouseY * bounds.halfH * 0.78;
+
+        const mDistX = mesh.position.x - mouseAtZ_X;
+        const mDistY = mesh.position.y - mouseAtZ_Y;
+        const mDist = Math.hypot(mDistX, mDistY);
+
+        // Interactive hover reaction within radius
+        let hoverEffect = 0;
+        if (mDist < 2.8) {
+          hoverEffect = Math.max(0, 1.0 - mDist / 2.8);
+        }
+
+        // Decay spin boost
+        ud.spinBoost *= 0.94;
+
+        // Dynamic rotation speed (spins faster on hover / click)
+        const speedMult = 1.0 + hoverEffect * 3.5 + ud.spinBoost * 8;
+        mesh.rotation.x += ud.rotX * speedMult;
+        mesh.rotation.y += ud.rotY * speedMult;
+        mesh.rotation.z += ud.rotZ * speedMult;
+
+        // Scale up smoothly on hover
+        const targetScale = 1.0 + hoverEffect * 0.4;
+        ud.currentScale += (targetScale - ud.currentScale) * 0.1;
+        mesh.scale.set(ud.currentScale, ud.currentScale, ud.currentScale);
+
+        // Glow brighter on hover
+        mesh.material.opacity = ud.baseOpacity + hoverEffect * 0.45;
+
+        // Gentle magnetic push/nudge away from cursor (still clamped inside bounds)
+        let repelX = 0;
+        let repelY = 0;
+        if (hoverEffect > 0) {
+          const angle = Math.atan2(mDistY, mDistX);
+          repelX = Math.cos(angle) * hoverEffect * 0.5;
+          repelY = Math.sin(angle) * hoverEffect * 0.35;
+        }
+
+        // Smooth position interpolation to anchored spot inside display
+        const destX = baseX + repelX;
+        const destY = baseY + floatY + repelY;
+        mesh.position.x += (destX - mesh.position.x) * 0.08;
+        mesh.position.y += (destY - mesh.position.y) * 0.08;
       });
 
       // Animate Particles (Cyber Data Stream)
@@ -319,10 +411,10 @@ function ThreeBackground() {
         pArr[idx + 2] += vel.z;
 
         if (pArr[idx + 2] > 6) {
-          pArr[idx + 2] = -22;
+          pArr[idx + 2] = -18;
           pArr[idx + 1] = -2 + Math.random() * 4;
         }
-        if (pArr[idx + 1] > 8) {
+        if (pArr[idx + 1] > 7.5) {
           pArr[idx + 1] = -2;
         }
       }
@@ -382,7 +474,6 @@ function ThreeBackground() {
     </div>
   );
 }
-
 const FEATURES = [
   { icon: Users, title: "Multi-Account Support", desc: "Run and monitor multiple Roblox accounts simultaneously from a single lightweight dashboard." },
   { icon: Zap, title: "Auto Rejoin", desc: "Detects crashes and connection drops instantly, relaunching your accounts right back into the game." },
