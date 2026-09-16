@@ -47,69 +47,340 @@ function useScrollReveal() {
 
 function ThreeBackground() {
   const mountRef = useRef(null);
+
   useEffect(() => {
-    const w = window.innerWidth;
-    const h = window.innerHeight;
+    const container = mountRef.current;
+    if (!container) return;
+
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+
+    // --- Scene & Fog ---
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x000000, 0.06);
+    // Cyber void fog - blends smoothly into deep cyber dark blue / black
+    scene.fog = new THREE.FogExp2(0x020617, 0.042);
 
-    const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 100);
-    camera.position.y = 1.5;
-    camera.position.z = 4;
-    camera.lookAt(0, 0, 0);
+    // --- Camera ---
+    const camera = new THREE.PerspectiveCamera(65, w / h, 0.1, 120);
+    camera.position.set(0, 1.8, 5.5);
+    camera.lookAt(0, 0, -2);
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    // --- Renderer ---
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true, powerPreference: "high-performance" });
     renderer.setSize(w, h);
-    renderer.setPixelRatio(window.devicePixelRatio);
-    mountRef.current.appendChild(renderer.domElement);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    container.appendChild(renderer.domElement);
 
-    // Cybertech Grid
-    const gridHelper = new THREE.GridHelper(60, 60, 0x00a8ff, 0x00a8ff);
-    gridHelper.material.transparent = true;
-    gridHelper.material.opacity = 0.15;
-    scene.add(gridHelper);
+    // --- Dynamic Interactive Ground Cyber Grid ---
+    const gridCols = 55;
+    const gridRows = 55;
+    const gridWidth = 72;
+    const gridLength = 72;
+    const groundGeo = new THREE.PlaneGeometry(gridWidth, gridLength, gridCols, gridRows);
+    groundGeo.rotateX(-Math.PI / 2);
 
-    let mouseX = 0, mouseY = 0;
-    const handleMouseMove = (e) => { mouseX = (e.clientX - w/2); mouseY = (e.clientY - h/2); };
-    window.addEventListener("mousemove", handleMouseMove);
+    const groundMat = new THREE.MeshBasicMaterial({
+      color: 0x00b4d8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.28,
+    });
+    const groundMesh = new THREE.Mesh(groundGeo, groundMat);
+    groundMesh.position.y = -2.2;
+    scene.add(groundMesh);
 
-    let time = 0;
+    // Glowing Neon Points at Grid Intersections
+    const pointsGeo = new THREE.BufferGeometry();
+    pointsGeo.setAttribute('position', groundGeo.attributes.position);
+    const pointsMat = new THREE.PointsMaterial({
+      color: 0x38bdf8,
+      size: 0.15,
+      transparent: true,
+      opacity: 0.65,
+      blending: THREE.AdditiveBlending,
+    });
+    const groundPoints = new THREE.Points(pointsGeo, pointsMat);
+    groundPoints.position.y = groundMesh.position.y;
+    scene.add(groundPoints);
+
+    // --- Upper Cyber Ceiling Grid ---
+    const ceilingGeo = new THREE.PlaneGeometry(72, 72, 36, 36);
+    ceilingGeo.rotateX(Math.PI / 2);
+    const ceilingMat = new THREE.MeshBasicMaterial({
+      color: 0x0284c7,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.08,
+    });
+    const ceilingMesh = new THREE.Mesh(ceilingGeo, ceilingMat);
+    ceilingMesh.position.y = 8.5;
+    scene.add(ceilingMesh);
+
+    // --- Floating Holographic Cyber Crystals / Polyhedrons ---
+    const crystals = [];
+    const crystalGeos = [
+      new THREE.IcosahedronGeometry(0.55, 0),
+      new THREE.OctahedronGeometry(0.5, 0),
+      new THREE.TetrahedronGeometry(0.5, 0),
+      new THREE.BoxGeometry(0.55, 0.55, 0.55),
+    ];
+    const crystalColors = [0x00f0ff, 0x00a8ff, 0x818cf8, 0x38bdf8];
+
+    for (let i = 0; i < 18; i++) {
+      const geo = crystalGeos[i % crystalGeos.length];
+      const color = crystalColors[i % crystalColors.length];
+
+      const mat = new THREE.MeshBasicMaterial({
+        color: color,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.35 + Math.random() * 0.25,
+        blending: THREE.AdditiveBlending,
+      });
+      const mesh = new THREE.Mesh(geo, mat);
+
+      const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.5;
+      const radius = 3.5 + Math.random() * 7;
+      mesh.position.x = Math.cos(angle) * radius;
+      mesh.position.y = -0.5 + Math.random() * 4.5;
+      mesh.position.z = -2 + (Math.random() - 0.5) * 10;
+
+      mesh.userData = {
+        rotX: (Math.random() - 0.5) * 0.015,
+        rotY: (Math.random() - 0.5) * 0.02,
+        rotZ: (Math.random() - 0.5) * 0.01,
+        initialY: mesh.position.y,
+        floatSpeed: 0.8 + Math.random() * 1.2,
+        floatOffset: Math.random() * Math.PI * 2,
+      };
+
+      scene.add(mesh);
+      crystals.push(mesh);
+    }
+
+    // --- Cyber Floating Particle Field (Data Packets) ---
+    const particleCount = 450;
+    const particlePositions = new Float32Array(particleCount * 3);
+    const particleVelocities = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      particlePositions[i * 3 + 0] = (Math.random() - 0.5) * 45;
+      particlePositions[i * 3 + 1] = -2 + Math.random() * 9;
+      particlePositions[i * 3 + 2] = -20 + Math.random() * 30;
+
+      particleVelocities.push({
+        x: (Math.random() - 0.5) * 0.006,
+        y: 0.004 + Math.random() * 0.008,
+        z: 0.01 + Math.random() * 0.02,
+      });
+    }
+
+    const particleGeo = new THREE.BufferGeometry();
+    particleGeo.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+    const particleMat = new THREE.PointsMaterial({
+      color: 0x00e5ff,
+      size: 0.11,
+      transparent: true,
+      opacity: 0.7,
+      blending: THREE.AdditiveBlending,
+    });
+    const particleSystem = new THREE.Points(particleGeo, particleMat);
+    scene.add(particleSystem);
+
+    // --- Dynamic Interactive 3D Lighting ---
+    const cursorLight = new THREE.PointLight(0x00f0ff, 4.5, 18);
+    cursorLight.position.set(0, 0, 3);
+    scene.add(cursorLight);
+
+    const ambientLight = new THREE.AmbientLight(0x020617, 1.5);
+    scene.add(ambientLight);
+
+    const horizonLight = new THREE.PointLight(0x3b82f6, 3, 40);
+    horizonLight.position.set(0, 0, -25);
+    scene.add(horizonLight);
+
+    // --- Mouse & Touch Interaction ---
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetMouseX = 0;
+    let targetMouseY = 0;
+    let clickShockwave = { active: false, x: 0, z: 0, radius: 0, strength: 0 };
+
+    const onMouseMove = (e) => {
+      const nx = (e.clientX / w) * 2 - 1;
+      const ny = -(e.clientY / h) * 2 + 1;
+      targetMouseX = nx;
+      targetMouseY = ny;
+    };
+
+    const onClick = (e) => {
+      const nx = (e.clientX / w) * 2 - 1;
+      clickShockwave.active = true;
+      clickShockwave.x = nx * 10;
+      clickShockwave.z = 0;
+      clickShockwave.radius = 0;
+      clickShockwave.strength = 1.6;
+    };
+
+    window.addEventListener("mousemove", onMouseMove, { passive: true });
+    window.addEventListener("click", onClick, { passive: true });
+
+    // --- Animation Loop ---
+    let clock = new THREE.Clock();
+    let animId = null;
+
     const animate = () => {
-      requestAnimationFrame(animate);
-      time += 0.005;
-      
-      // Move grid towards camera to simulate forward movement
-      gridHelper.position.z = (time * 10) % 1;
-      
-      // Subtle camera sway
-      const targetX = mouseX * 0.0005;
-      const targetY = mouseY * 0.0005 + 1.5;
-      camera.position.x += (targetX - camera.position.x) * 0.05;
-      camera.position.y += (targetY - camera.position.y) * 0.05;
-      camera.lookAt(0, 0, 0);
+      animId = requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // Smooth mouse lerp
+      mouseX += (targetMouseX - mouseX) * 0.05;
+      mouseY += (targetMouseY - mouseY) * 0.05;
+
+      // Camera Parallax
+      camera.position.x = mouseX * 1.2;
+      camera.position.y = 1.8 + mouseY * 0.7;
+      camera.lookAt(mouseX * 0.4, -0.2 + mouseY * 0.3, -3);
+
+      // Update Cursor 3D Point Light
+      cursorLight.position.x = mouseX * 8;
+      cursorLight.position.y = -0.5 + mouseY * 4;
+      cursorLight.position.z = 2.5;
+
+      // Pulsing horizon glow
+      horizonLight.intensity = 2.5 + Math.sin(time * 2) * 0.8;
+
+      // Animate Ground Cyber Waves & Interactive Ripples
+      const positions = groundGeo.attributes.position.array;
+      const waveSpeed = time * 2.2;
+
+      if (clickShockwave.active) {
+        clickShockwave.radius += delta * 18;
+        clickShockwave.strength *= 0.96;
+        if (clickShockwave.strength < 0.02 || clickShockwave.radius > 50) {
+          clickShockwave.active = false;
+        }
+      }
+
+      const count = groundGeo.attributes.position.count;
+      for (let i = 0; i < count; i++) {
+        const vx = positions[i * 3 + 0];
+        const vz = positions[i * 3 + 2];
+
+        // Rolling cyber wave
+        let vy = Math.sin(vx * 0.18 + waveSpeed) * 0.45 
+               + Math.cos(vz * 0.14 + waveSpeed * 0.8) * 0.45;
+
+        // Interactive mouse proximity wave
+        const dx = vx - (mouseX * 12);
+        const dz = vz - (-2 - mouseY * 6);
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        if (dist < 14) {
+          const factor = Math.cos((dist / 14) * Math.PI * 0.5);
+          vy += factor * 0.9 * Math.sin(dist * 0.8 - time * 4);
+        }
+
+        // Click shockwave expansion
+        if (clickShockwave.active) {
+          const sDist = Math.hypot(vx - clickShockwave.x, vz - clickShockwave.z);
+          const diff = Math.abs(sDist - clickShockwave.radius);
+          if (diff < 3.5) {
+            vy += Math.sin((1 - diff / 3.5) * Math.PI) * clickShockwave.strength;
+          }
+        }
+
+        positions[i * 3 + 1] = vy;
+      }
+      groundGeo.attributes.position.needsUpdate = true;
+      groundPoints.geometry.attributes.position.needsUpdate = true;
+
+      // Forward motion on ceiling grid
+      ceilingMesh.position.z = (time * 2) % 2;
+
+      // Animate Floating Cyber Crystals
+      crystals.forEach((mesh) => {
+        mesh.rotation.x += mesh.userData.rotX;
+        mesh.rotation.y += mesh.userData.rotY;
+        mesh.rotation.z += mesh.userData.rotZ;
+        mesh.position.y = mesh.userData.initialY + Math.sin(time * mesh.userData.floatSpeed + mesh.userData.floatOffset) * 0.35;
+        mesh.position.x += ((mesh.position.x + mouseX * 0.3) - mesh.position.x) * 0.02;
+      });
+
+      // Animate Particles (Cyber Data Stream)
+      const pArr = particleGeo.attributes.position.array;
+      for (let i = 0; i < particleCount; i++) {
+        const idx = i * 3;
+        const vel = particleVelocities[i];
+
+        pArr[idx + 1] += vel.y;
+        pArr[idx + 2] += vel.z;
+
+        if (pArr[idx + 2] > 6) {
+          pArr[idx + 2] = -22;
+          pArr[idx + 1] = -2 + Math.random() * 4;
+        }
+        if (pArr[idx + 1] > 8) {
+          pArr[idx + 1] = -2;
+        }
+      }
+      particleGeo.attributes.position.needsUpdate = true;
 
       renderer.render(scene, camera);
     };
+
     animate();
 
+    // --- Window Resize Handling ---
     const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
+      w = window.innerWidth;
+      h = window.innerHeight;
+      camera.aspect = w / h;
       camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setSize(w, h);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     };
     window.addEventListener("resize", handleResize);
 
+    // --- Cleanup ---
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
+      cancelAnimationFrame(animId);
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("click", onClick);
       window.removeEventListener("resize", handleResize);
-      if(mountRef.current && mountRef.current.contains(renderer.domElement)) {
-          mountRef.current.removeChild(renderer.domElement);
+
+      if (container && container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
       }
-      gridHelper.dispose(); renderer.dispose();
+
+      groundGeo.dispose();
+      groundMat.dispose();
+      pointsGeo.dispose();
+      pointsMat.dispose();
+      ceilingGeo.dispose();
+      ceilingMat.dispose();
+      particleGeo.dispose();
+      particleMat.dispose();
+      crystalGeos.forEach(g => g.dispose());
+      crystals.forEach(c => c.material.dispose());
+      renderer.dispose();
     };
   }, []);
-  // Use a dark tech-blue/black gradient instead of the old dark green
-  return <div ref={mountRef} className="fixed inset-0 z-[-1] pointer-events-none bg-gradient-to-b from-[#020617] via-[#000000] to-[#000000]" />;
+
+  return (
+    <div 
+      ref={mountRef} 
+      className="fixed inset-0 z-[-1] pointer-events-none bg-gradient-to-b from-[#020617] via-[#01030a] to-[#000000]"
+    >
+      {/* Cyber Ambient Glows & Vignette */}
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_15%,rgba(0,180,216,0.14),transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_50%_85%,rgba(99,102,241,0.10),transparent_65%)] pointer-events-none" />
+      {/* Subtle Cyber scanline overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,38,0)_50%,rgba(0,0,0,0.25)_50%)] bg-[length:100%_4px] pointer-events-none opacity-40" />
+    </div>
+  );
 }
 
 const FEATURES = [
